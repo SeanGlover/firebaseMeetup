@@ -1,38 +1,26 @@
 <head>
   <meta charset="utf-8" />
   <title>Firebase Meetup</title>
-  <link
-    type="text/css"
-    rel="stylesheet"
-    href="https://cdn.firebase.com/libs/firebaseui/4.0.0/firebaseui.css"
-  />
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Roboto:300,400,700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    rel="stylesheet"
-  />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/4.0.0/firebaseui.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300&display=swap" rel="stylesheet"> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+  <!-- <link rel="stylesheet" href="styles/styles.css"> -->
+  <script src="/dist/main.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
-<body>
+<body style="font-family: 'Raleway', sans-serif;">
   <div id="app">
-    <img
-      src="https://firebasestorage.googleapis.com/v0/b/fir-images-a61c9.appspot.com/o/codelab.png?alt=media&token=f45f808c-ce40-4b34-944c-8d8fac00e13d"
-    />
-
+    <img src="https://firebasestorage.googleapis.com/v0/b/fir-images-a61c9.appspot.com/o/codelab.png?alt=media&token=f45f808c-ce40-4b34-944c-8d8fac00e13d"/>
     <section id="event-details-container">
       <h1>Firebase Meetup</h1>
-
       <p><i class="material-icons">calendar_today</i> October 30</p>
       <p><i class="material-icons">location_city</i> San Francisco</p>
       <!-- ADD THE RSVP BUTTON HERE -->
       <button id="startRsvp">RSVP</button>
     </section>
-
-    <hr />
 
     <section id="firebaseui-auth-container"></section>
 

@@ -1,0 +1,30 @@
+{
+  "name": "firebasemeetup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack --config=webpack.dev.js --watch",
+    "build": "webpack --config=webpack.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SeanGlover/firebaseMeetup.git"
+  },
+  "author": "Sean",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SeanGlover/firebaseMeetup/issues"
+  },
+  "homepage": "https://github.com/SeanGlover/firebaseMeetup#readme",
+  "dependencies": {
+    "firebase": "^9.16.0",
+    "firebaseui": "^6.0.2",
+    "html-webpack-plugin": "^5.5.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  }
+}

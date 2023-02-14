@@ -1,7 +1,4 @@
-// Import stylesheets
-import './style.css';
-
-import { initializeApp } from 'firebase/app';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js'; //'firebase/app';
 const firebaseConfig = {
   apiKey: "AIzaSyBSxg6mwQc4zoQ8VvRFyLg2Nwi8rTbXIXg",
   authDomain: "fir-web-codelab-a1.firebaseapp.com",
@@ -15,10 +12,11 @@ const app = initializeApp(firebaseConfig);
 // Add the Firebase products and methods that you want to use
 import {
   getAuth,
-  EmailAuthProvider,
+  signInWithEmailAndPassword,
   signOut,
+  EmailAuthProvider,
   onAuthStateChanged
-} from 'firebase/auth';
+} from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js'; //'firebase/auth';
 import {
   getFirestore,
   addDoc,
@@ -29,9 +27,8 @@ import {
   doc,
   setDoc,
   where
-} from 'firebase/firestore';
-
-import * as firebaseui from 'firebaseui';
+} from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js' //firebase/firestore 'https://www.gstatic.com/firebasejs/9.4.0/firebase-firestore.js';
+import * as firebaseui from 'https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -51,74 +48,79 @@ let rsvpListener = null;
 let guestbookListener = null;
 
 async function main() {
-  // Initialize the FirebaseUI widget using Firebase
-  const ui = new firebaseui.auth.AuthUI(auth);
+  var signedIn = false; 
+  //#region firebaseui - is depricated
 
-  // FirebaseUI config
-  const uiConfig = {
-    credentialHelper: firebaseui.auth.CredentialHelper.NONE,
-    signInOptions: [
-      // Email / Password Provider.
-      EmailAuthProvider.PROVIDER_ID,
-    ],
-    callbacks: {
-      signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-        // Handle sign-in.
-        // Return false to avoid redirect.
-        return false;
-      },
-    },
-  };
+  // Initialize the FirebaseUI widget using Firebase
+  //// import * as firebaseui from 'https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js';
+  //// const firebaseui = await import('https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js');
+  // const ui = new firebaseui.auth.AuthUI(auth);
+  // ui.start("#firebaseui", {
+  //   signInOptions: [firebaseAuthObject.EmailAuthProvider.PROVIDER_ID],
+  // });
+  // const uiConfig = {
+  //   credentialHelper: firebaseui.auth.CredentialHelper.NONE,
+  //   signInOptions: [
+  //     EmailAuthProvider.PROVIDER_ID,
+  //   ],
+  //   callbacks: {
+  //     signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+  //       // Handle sign-in.
+  //       // Return false to avoid redirect.
+  //       return false;
+  //     },
+  //   },
+  // };
+  //#endregion
 
   startRsvpButton.addEventListener('click', () => {
     if (auth.currentUser) {
       // User is signed in; allows user to sign out
       signOut(auth);
+
     } else {
       // No user is signed in; allows user to sign in
       ui.start('#firebaseui-auth-container', uiConfig);
+
     }
   });
 
-  rsvpYes.onclick = async () => {
-    const userRef = doc(db, 'attendees', auth.currentUser.uid);
-    try {
-      await setDoc(userRef, {
-        attending: true
-      });
-    } catch (e) {
-      console.error(e);
+  startRsvpButton.onclick = async (event)=>{
+    alert(event.target.id);
+  }
+
+  rsvpYes.onclick = async (event) => {yesNo_onClick(event.target)};
+  rsvpNo.onclick = async (event) => {yesNo_onClick(event.target)};
+  async function yesNo_onClick(sender) {
+    if(!signedIn) {
+      await SigninEmailPassword();
+      signedIn = true;
     }
-  };
-  rsvpNo.onclick = async () => {
-    const userRef = doc(db, 'attendees', auth.currentUser.uid);
-    try {
-      await setDoc(userRef, {
-        attending: false
-      });
-    } catch (e) {
-      console.error(e);
+    else {
+
     }
-  };
+    var willAttend = sender === rsvpYes;
+    alert(`sender: ${sender.id}\nattending: ${willAttend}\nuserId: ${auth.currentUser.uid}`);
+    if (auth.currentUser != null) {
+      const userRef = doc(db, 'attendees', auth.currentUser.uid); // auth.currentUser.uid|'9b081a89-21e0-4f05-802c-af1652e3d2ce'
+      try {
+        await setDoc(userRef, { attending: willAttend });
+      } catch (e) { alert(`setDoc error: ${e}`); console.error(e); }
+    }
+  }
     
   onAuthStateChanged(auth, user => {
     if (user) {
       startRsvpButton.textContent = 'LOGOUT';
       // Show guestbook to logged-in users
       guestbookContainer.style.display = 'block';
-
-      // Subscribe to the guestbook collection
       subscribeGuestbook();
-      // Subcribe to the user's RSVP
       subscribeCurrentRSVP(user);
     } else {
       startRsvpButton.textContent = 'RSVP';
       // Hide guestbook for non-logged-in users
-      guestbookContainer.style.display = 'none'
-      ;
-      // Unsubscribe from the guestbook collection
+      guestbookContainer.style.display = 'block'; // block for testing, none is default
       unsubscribeGuestbook();
-      // Unsubscribe from the guestbook collection
       unsubscribeCurrentRSVP();
     }
   });
@@ -194,7 +196,33 @@ async function main() {
     }
     rsvpYes.className = '';
     rsvpNo.className = '';
-  }  
+  }
 
+  function createGUID() {
+    return('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    }));
+  }
+
+  async function SigninEmailPassword() {
+    const signin = await signInWithEmailAndPassword(auth, 'seanglover.spg@gmail.com', 'k6K4Vj8wrvRSjTA')
+    .then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      // ....... do something
+    }).catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+    });
+    return signin;
+  }
+  async function SignOut() {
+    signOut(auth).then(() => {
+      alert('signed out ok');
+    }).catch((error) => {
+      alert(error.message);
+    });
+  }
 }
 main();
