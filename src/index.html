@@ -9,7 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="shortcut icon" href="../src/monkey.ico">
     <link rel="stylesheet" href="../src/styles.css"/>
-    <script type="module" src="../src/index.js" defer></script></head>
+    <script type="module" src="../src/index.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
   </head>
   
   <body style="font-family: 'Raleway', sans-serif;">
@@ -18,7 +19,7 @@
       <section id="event-details-container">
         <h1>Firebase Meetup</h1>
         <p><i class="material-icons">calendar_today</i>February 15</p>
-        <p><i class="material-icons">location_city</i>San Francisco</p>
+        <p id="cityLocation"><i class="material-icons">location_city</i>San Francisco</p>
         <!-- ADD THE RSVP BUTTON HERE -->
         <button id="startRsvp">RSVP</button>
       </section>

@@ -28,7 +28,7 @@ import {
   setDoc,
   where
 } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js' //firebase/firestore 'https://www.gstatic.com/firebasejs/9.4.0/firebase-firestore.js';
-import * as firebaseui from 'https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js';
+// import * as firebaseui from 'https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -43,79 +43,43 @@ const guestbook = document.getElementById('guestbook');
 const numberAttending = document.getElementById('number-attending');
 const rsvpYes = document.getElementById('rsvp-yes');
 const rsvpNo = document.getElementById('rsvp-no');
+const city = document.getElementById('cityLocation');
 
 let rsvpListener = null;
 let guestbookListener = null;
 
 async function main() {
-  var signedIn = false; 
-  //#region firebaseui - is depricated
+  var signedIn = false;
+  $( document ).ready(function() {
 
-  // Initialize the FirebaseUI widget using Firebase
-  //// import * as firebaseui from 'https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js';
-  //// const firebaseui = await import('https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js');
-  // const ui = new firebaseui.auth.AuthUI(auth);
-  // ui.start("#firebaseui", {
-  //   signInOptions: [firebaseAuthObject.EmailAuthProvider.PROVIDER_ID],
-  // });
-  // const uiConfig = {
-  //   credentialHelper: firebaseui.auth.CredentialHelper.NONE,
-  //   signInOptions: [
-  //     EmailAuthProvider.PROVIDER_ID,
-  //   ],
-  //   callbacks: {
-  //     signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-  //       // Handle sign-in.
-  //       // Return false to avoid redirect.
-  //       return false;
-  //     },
-  //   },
-  // };
-  //#endregion
+    startRsvpButton.onclick = async () => { rsvpClicked() };
+    rsvpYes.onclick = async (event) => { yesNo_onClick(event.target) };
+    rsvpNo.onclick = async (event) => { yesNo_onClick(event.target) };
 
-  startRsvpButton.addEventListener('click', () => {
-    if (auth.currentUser) {
-      // User is signed in; allows user to sign out
-      signOut(auth);
+});
 
-    } else {
-      // No user is signed in; allows user to sign in
-      ui.start('#firebaseui-auth-container', uiConfig);
+//#region sign in/out
+  async function rsvpClicked() {
+    if(signedIn) {
+      var user = auth.currentUser;
+      signOut(auth).then(() => {
+        console.log(`${user.uid} is now signed out`);
 
+      }).catch(error => { alert(`${error.code}: ${error.message}`); });
     }
-  });
-
-  startRsvpButton.onclick = async (event)=>{
-    alert(event.target.id);
+    else { await SigninEmailPassword(); }
   }
 
-  rsvpYes.onclick = async (event) => {yesNo_onClick(event.target)};
-  rsvpNo.onclick = async (event) => {yesNo_onClick(event.target)};
-  async function yesNo_onClick(sender) {
-    if(!signedIn) {
-      await SigninEmailPassword();
-      signedIn = true;
-    }
-    else {
-
-    }
-    var willAttend = sender === rsvpYes;
-    alert(`sender: ${sender.id}\nattending: ${willAttend}\nuserId: ${auth.currentUser.uid}`);
-    if (auth.currentUser != null) {
-      const userRef = doc(db, 'attendees', auth.currentUser.uid); // auth.currentUser.uid|'9b081a89-21e0-4f05-802c-af1652e3d2ce'
-      try {
-        await setDoc(userRef, { attending: willAttend });
-      } catch (e) { alert(`setDoc error: ${e}`); console.error(e); }
-    }
-  }
-    
   onAuthStateChanged(auth, user => {
-    if (user) {
+    signedIn = user != null && user.uid != null;
+    // city.innerHTML = signedIn ? "I'm in!" : "I'm out!";
+    if (signedIn) {
       startRsvpButton.textContent = 'LOGOUT';
       // Show guestbook to logged-in users
       guestbookContainer.style.display = 'block';
       subscribeGuestbook();
       subscribeCurrentRSVP(user);
+
     } else {
       startRsvpButton.textContent = 'RSVP';
       // Hide guestbook for non-logged-in users
@@ -123,7 +87,19 @@ async function main() {
       unsubscribeGuestbook();
       unsubscribeCurrentRSVP();
     }
-  });
+  });  
+//#endregion
+
+  async function yesNo_onClick(sender) {
+    var willAttend = sender === rsvpYes;
+    // alert(`sender: ${sender.id}\nattending: ${willAttend}\nuserId: ${auth.currentUser.uid}`);
+    if (auth.currentUser != null) {
+      const userRef = doc(db, 'attendees', auth.currentUser.uid); // auth.currentUser.uid|'9b081a89-21e0-4f05-802c-af1652e3d2ce'
+      try {
+        await setDoc(userRef, { attending: willAttend });
+      } catch (e) { alert(`setDoc error: ${e}`); console.error(e); }
+    }
+  }
 
   form.addEventListener('submit', async e => {
     // Prevent the default form redirect
@@ -205,24 +181,23 @@ async function main() {
     }));
   }
 
+  // sign in using my credentials
   async function SigninEmailPassword() {
     const signin = await signInWithEmailAndPassword(auth, 'seanglover.spg@gmail.com', 'k6K4Vj8wrvRSjTA')
     .then((userCredential) => {
       // Signed in
       const user = userCredential.user;
+      console.log(`${user.uid} is now signed in`);
       // ....... do something
+
     }).catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
+      console.log(`${errorCode}: ${errorMessage}`);
+      // ....... do something
+      
     });
     return signin;
-  }
-  async function SignOut() {
-    signOut(auth).then(() => {
-      alert('signed out ok');
-    }).catch((error) => {
-      alert(error.message);
-    });
   }
 }
 main();
