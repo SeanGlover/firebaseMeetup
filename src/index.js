@@ -43,7 +43,6 @@ const guestbook = document.getElementById('guestbook');
 const numberAttending = document.getElementById('number-attending');
 const rsvpYes = document.getElementById('rsvp-yes');
 const rsvpNo = document.getElementById('rsvp-no');
-const city = document.getElementById('cityLocation');
 
 let rsvpListener = null;
 let guestbookListener = null;
@@ -72,7 +71,6 @@ async function main() {
 
   onAuthStateChanged(auth, user => {
     signedIn = user != null && user.uid != null;
-    // city.innerHTML = signedIn ? "I'm in!" : "I'm out!";
     if (signedIn) {
       startRsvpButton.textContent = 'LOGOUT';
       // Show guestbook to logged-in users
@@ -83,7 +81,7 @@ async function main() {
     } else {
       startRsvpButton.textContent = 'RSVP';
       // Hide guestbook for non-logged-in users
-      guestbookContainer.style.display = 'block'; // block for testing, none is default
+      guestbookContainer.style.display = 'none'; // block for testing, none is default
       unsubscribeGuestbook();
       unsubscribeCurrentRSVP();
     }
@@ -94,9 +92,10 @@ async function main() {
     var willAttend = sender === rsvpYes;
     // alert(`sender: ${sender.id}\nattending: ${willAttend}\nuserId: ${auth.currentUser.uid}`);
     if (auth.currentUser != null) {
-      const userRef = doc(db, 'attendees', auth.currentUser.uid); // auth.currentUser.uid|'9b081a89-21e0-4f05-802c-af1652e3d2ce'
+      const userRef = doc(db, 'attendees', auth.currentUser.uid);
       try {
         await setDoc(userRef, { attending: willAttend });
+        console.log(`sent response that ${auth.currentUser.uid} will ${willAttend ? '' : 'not '}attend`);
       } catch (e) { alert(`setDoc error: ${e}`); console.error(e); }
     }
   }
