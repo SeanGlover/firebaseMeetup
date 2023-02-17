@@ -1,56 +1,50 @@
-@media all and (min-width:1200px){
-    #app{
-        max-width: 1000px;
-        margin: 0 auto;
-    }
-}
-@media all and (min-width: 960px) and (max-width: 1199px) {
-    #app{
-        max-width: 900px;
-        margin: 0 auto;
-    }
+details[open] summary ~ * {
+  animation: open 0.9s ease-in-out;
 }
 
-@media all and (max-width: 599px) {
-    img{
-        width:100%;
-        height:200px;
-        object-fit: cover;
-    }
+details summary::-webkit-details-marker {
+  display: none;
 }
 
-@media all and (min-width: 600px) {
-    section {
-        clear: both;
-        display: block;
-    }
-    #event-details-container{
-        clear: none;
-    }
-    img{
-        width:60%;
-        height:300px;
-        float: left;
-        border-radius: 8px;
-        object-fit: cover;
-        margin-right: 20px;
-        margin-left: 20px;
-        margin-bottom: 20px;
-    }
+details summary {
+  width: 50%;
+  /* border-top: 1px solid black; */
+  position: relative;
+  cursor: pointer;
+  font-size: 1.75rem;
+  font-weight: bold;
+  font-weight: 300;
+  list-style: none;
+  display: flex;    
+  border-radius: 5px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, .05);
+  border-left: 15px solid gray;
+  padding: 15px;
+  margin-top: 15px;
+  outline: 0;
+  margin-left: 20px;
 }
-
-hr {
-    clear: both;
-    margin-bottom: 20px;
-    margin-top: 20px;
+details summary:after {
+  content: "+";
+  color: rgb(70, 46, 103);
+  position: absolute;
+  font-size: 6rem;
+  height: 40px;
+  line-height: 40px;
+  right: 7;
+  font-weight: bold;
+  font-weight: 300;
+  transform-origin: center;
+  transition: 100ms linear;
 }
-
-section {
-    margin: 20px;
+details[open] summary:after {
+  transform: rotate(45deg);
+  font-size: 6rem;
 }
-
-.material-icons {
-    padding-right: 10px;
+details p {
+  font-size: 0.95rem;
+  padding-top: 1rem;
 }
 
 body {
@@ -58,15 +52,25 @@ body {
     font-family: 'Raleway', 'Open Sans', sans-serif;
 }
 
+section {
+    padding-top: 2rem;
+    width: 100%;
+    margin: auto;
+    margin: 2px;
+  }
+hr {
+    clear: both;
+    margin-bottom: 3px;
+    margin-top: 3px;
+}
+
 h1, h2, h3, p {
     font-family: 'Raleway', 'Roboto', sans-serif;
     font-weight: normal;
 }
-
 h1 {
     font-size: 48px;
 }
-
 h2 {
     margin-bottom: 0px;
 }
@@ -77,8 +81,8 @@ label{
 
 p {
     font-size: 18px;
-    margin-top:10px;
-    margin-bottom:0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 #guestbook > p {
@@ -86,45 +90,51 @@ p {
     font-size: 14px;
 }
 
+.flex-fill.list-group-item {
+    min-height: 30px;
+}
+
 input{
     border: none;
     border-bottom: 1px solid rgba(0,0,0,.12);
     font-size: 14px;
-    padding: 4px 0;
     background: 0 0;
     text-align: left;
     color: inherit;
 }
 
+.input-group-append {
+    cursor: pointer;
+}
+th {
+    text-align: center; /* Or right or left */
+}
+textarea {
+    resize: none;
+    overflow: hidden;
+    min-height: 50px;
+    max-height: 300px;
+}
+.card {
+    width: 380px;
+    border: none;
+    height: 280px;
+}
 button.clicked{
     background-color: rgb(60, 67, 154);
     border-color: rgb(60, 67, 154);
     color: white;
     outline-color: rgb(60, 67, 154);
 }
-
-button, button.firebaseui-id-submit.mdl-button--raised.mdl-button--colored{
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0);
-    border-color: rgb(60, 67, 154);
+.button-success {
+    color: white;
     border-radius: 4px;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: none;
-    color: rgb(60, 67, 154);
-    cursor: default;
-    display: inline-flex;
-    font-family: Roboto, sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    height: 36px;
-    justify-content: center;
-    margin: 8px 16px;
-    outline-color: rgb(60, 67, 154);
-    overflow: hidden;
-    padding: 0px 15px;
-    position: relative;
-    text-align: center;
-    text-transform: uppercase;
-    vertical-align: middle;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    background: rgb(28, 184, 65);
+}
+.button-xlarge {
+    font-size: 125%;
+}
+.honeypot-field {
+    display: none;
 }

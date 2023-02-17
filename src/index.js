@@ -34,16 +34,19 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Document elements
+const sectionReports = document.getElementById('sectionReports');
+const detailsTemplate = document.getElementById('detailsTemplate');
 const startRsvpButton = document.getElementById('startRsvp');
 const guestbookContainer = document.getElementById('guestbook-container');
-
-const form = document.getElementById('leave-message');
-const input = document.getElementById('message');
 const guestbook = document.getElementById('guestbook');
 const numberAttending = document.getElementById('number-attending');
 const rsvpYes = document.getElementById('rsvp-yes');
 const rsvpNo = document.getElementById('rsvp-no');
+const form = document.getElementById('leave-message');
+const input = document.getElementById('message');
+const submitForm = document.getElementById('submitForm');
 
+let reportsListener = null;
 let rsvpListener = null;
 let guestbookListener = null;
 
@@ -54,10 +57,19 @@ async function main() {
     startRsvpButton.onclick = async () => { rsvpClicked() };
     rsvpYes.onclick = async (event) => { yesNo_onClick(event.target) };
     rsvpNo.onclick = async (event) => { yesNo_onClick(event.target) };
+    
+    window.scrollTo(0, 0);
+    // some test code to run
+    var xx = false;
+    if(xx) {
+      document.getElementById("centreLeCap").open = true; // set this programatically
+      addNewReport();
+    }
 
 });
 
 //#region sign in/out
+  // rsvp button signs the user in or out
   async function rsvpClicked() {
     if(signedIn) {
       var user = auth.currentUser;
@@ -68,7 +80,7 @@ async function main() {
     }
     else { await SigninEmailPassword(); }
   }
-
+  // catches firebase state change when a user signs in or out
   onAuthStateChanged(auth, user => {
     signedIn = user != null && user.uid != null;
     if (signedIn) {
@@ -77,6 +89,7 @@ async function main() {
       guestbookContainer.style.display = 'block';
       subscribeGuestbook();
       subscribeCurrentRSVP(user);
+      subscribeReportIteration();
 
     } else {
       startRsvpButton.textContent = 'RSVP';
@@ -85,7 +98,24 @@ async function main() {
       unsubscribeGuestbook();
       unsubscribeCurrentRSVP();
     }
-  });  
+  });
+  // sign in using my credentials
+  async function SigninEmailPassword() {
+    const signin = await signInWithEmailAndPassword(auth, 'seanglover.spg@gmail.com', 'k6K4Vj8wrvRSjTA')
+    .then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      console.log(`${user.uid} is now signed in`);
+      // ....... do something
+    }).catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(`${errorCode}: ${errorMessage}`);
+      // ....... do something
+      
+    });
+    return signin;
+  }
 //#endregion
 
   async function yesNo_onClick(sender) {
@@ -173,30 +203,121 @@ async function main() {
     rsvpNo.className = '';
   }
 
-  function createGUID() {
-    return('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    }));
-  }
+  // create reports for each JSON file in firestore.reports collection
+  function subscribeReportIteration() {
+    // reset reports section - except the 'Reports' header and the Template
+    var childrenReports = sectionReports.getElementsByClassName('details');
+    for (var i=0, item; item = childrenReports[i]; i++) {
+      if(item.id != 'detailsTemplate') {
+        sectionReports.removeChild(item);
+      }
+    }
+    const q = query(collection(db, 'reports'), orderBy('timestamp', 'name'));
+    reportsListener = onSnapshot(q, snaps => {
+      // Create a new Details element for each document in the database
+      snaps.forEach(doc => {
+        var clone = detailsTemplate.cloneNode(true);
+        var docData = doc.data();
+        clone.id = docData.name;
 
-  // sign in using my credentials
-  async function SigninEmailPassword() {
-    const signin = await signInWithEmailAndPassword(auth, 'seanglover.spg@gmail.com', 'k6K4Vj8wrvRSjTA')
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      console.log(`${user.uid} is now signed in`);
-      // ....... do something
+        var summaryClone = clone.getElementsByTagName('summary')[0];
+        summaryClone.innerHTML = docData.name;
 
-    }).catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(`${errorCode}: ${errorMessage}`);
-      // ....... do something
-      
+        // dependant on if job is complete
+        summaryClone.style.borderLeft = '15px solid grey';
+        submitForm.disabled = true;
+        submitForm.className = "button pure-button button-xlarge";
+
+        clone.style = "display: block";
+        sectionReports.appendChild(clone);
+
+        // const entry = document.createElement('p');
+        // entry.textContent = doc.data().name + ': ' + doc.data().text;
+        // guestbook.appendChild(entry);
+      });
     });
-    return signin;
   }
+  function unsubscribeReportIteration() {
+
+  }
+
+  //#region misc functions
+  function createGUID() {
+return('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+return v.toString(16);
+}));
+  }
+  async function addNewReport() {
+    try {
+      await setDoc(doc(db, "reports", "leCap"),
+      {
+        "Serials": {
+          "41752 Rainbow Bumpas- Set Of 3": [
+            "N° 535"
+          ],
+          "21098RO Sensory Magic": [
+            "N° 992"
+          ],
+          "41671 Maxi Bubble Tube Chassis Slim Profile": [
+            "N° 10601657"
+          ],
+          "41148 Wireless Controller": [
+            "N° 3752"
+          ],
+          "41541 Interative Light Engine": [
+            "N° 10877"
+          ],
+          "42090 Ust Projector": [
+            "N° Q7C6150HAAAAB0140"
+          ],
+          "37969 Laser Stars™": [
+            "N° 114308_jan2022"
+          ],
+          "41655 Wi Fi Color Wall Controller": [
+            "N° 1987"
+          ],
+          "21001R Wifi Led Furniture Cube": [
+            "N° 1312"
+          ],
+          "22870R Sound To Sight Showtime Panel": [
+            "N° 10642603"
+          ],
+          "22873R Color Catch Combo Panel": [
+            "N° 10642807"
+          ]
+        },
+        "Trained": {
+          "Names": [
+            "? in lieu of Nadine"
+          ],
+          "Products": {
+            "37969": "Laser Stars™",
+            "41148": "Wireless Controller",
+            "41576": "Maxi Bubble Tube",
+            "41655": "Wi Fi Color Wall Controller",
+            "41671": "Maxi Bubble Tube Chassis Slim Profile",
+            "41752": "Rainbow Bumpas- Set Of 3",
+            "41838": "Acrylic Mirror- L96\" X W48\"",
+            "42090": "Ust Projector",
+            "42248": "Univ Flat Wall Mtn For 10-24 In Display",
+            "21098RO": "Sensory Magic",
+            "21001R": "Wifi Led Furniture Cube",
+            "22870R": "Sound To Sight Showtime Panel",
+            "22873R": "Color Catch Combo Panel"
+          }
+        },
+        "Notes": {
+          "Comments": "Client will add electrical for the projector / wall washer after-the-fact",
+          "Issues": "Wall washer requires adjustment as per below instructions... \r\n● Repeatedly press the “MODE” button on the wall washer until the display on the back of the wall washer displays “Addr.”\r\n● Now repeatedly press the “SET UP” button until the display shows “d.001” (or similar number).\r\n● Press “UP” and “DOWN” until the display shows “d.001”. Now press the “SET UP” button once.\r\n● Use the “UP” and “DOWN” buttons to select “03C.H”"  
+        }
+      }
+      );
+    }
+    catch (error) {
+      alert(error.message);
+    }   
+  }
+  //#endregion
 }
 main();
